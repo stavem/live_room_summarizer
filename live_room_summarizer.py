@@ -1,21 +1,22 @@
 import streamlit as st
-import requests
 import pandas as pd
 from get_results import *
 
 if 'start_point' not in st.session_state:
     st.session_state['start_point'] = 0
 
+
 def update_start(start_t):
-    st.session_state['start_point'] = int(start_t/1000)
+    st.session_state['start_point'] = int(start_t / 1000)
+
 
 uploaded_file = st.file_uploader('Please upload a file')
 
 if uploaded_file is not None:
     st.audio(uploaded_file, start_time=st.session_state['start_point'])
-    polling_endpoint = upload_to_AssemblyAI(uploaded_file)
-    
-    status='submitted'
+    polling_endpoint = upload_to_assembly_ai(uploaded_file)
+
+    status = 'submitted'
     while status != 'completed':
         polling_response = requests.get(polling_endpoint, headers=headers)
         # print(polling_response.json())
@@ -23,15 +24,11 @@ if uploaded_file is not None:
 
         if status == 'completed':
 
-            #display categories
-            st.subheader('Main themes')
-            with st.expander('Themes'):
-                categories = polling_response.json()['iab_categories_result']['summary']
-                for cat in categories:
-                    st.markdown("* " + cat)
+            # # display categories
+            # st.subheader('Full Response')
+            # st.write(polling_response.json())
 
-
-            #display chapter summaries
+            # display chapter summaries
             st.subheader('Summary notes of this meeting')
             chapters = polling_response.json()['chapters']
             chapters_df = pd.DataFrame(chapters)
@@ -42,8 +39,7 @@ if uploaded_file is not None:
                 with st.expander(row['gist']):
                     st.write(row['summary'])
                     st.button(row['start_str'], on_click=update_start, args=(row['start'],))
-                    
-            
+
             # display transcript
             st.subheader('Full Transcript')
             # Get the paragraphs of the transcript
@@ -53,9 +49,6 @@ if uploaded_file is not None:
             paragraphs = []
             for para in paragraphs_response['paragraphs']:
                 paragraphs.append(para)
-            
+
             for para in paragraphs:
                 st.write(para['text'] + '\n')
-
-
-        

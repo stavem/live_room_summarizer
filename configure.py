@@ -1,1 +1,0 @@
-auth_token = 'a820b3f9f7434afda4f4e40224e34515'

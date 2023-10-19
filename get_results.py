@@ -1,13 +1,14 @@
 import requests
-from configure import *
+# from configure import *
+import streamlit as st
 
 headers = {
-    "authorization": auth_token,
+    "authorization": st.secrets["AUTH_TOKEN"],
     "content-type": "application/json"
 }
 
-def upload_to_AssemblyAI(audio_file):
 
+def upload_to_assembly_ai(audio_file):
     transcript_endpoint = "https://api.assemblyai.com/v2/transcript"
     upload_endpoint = 'https://api.assemblyai.com/v2/upload'
 
